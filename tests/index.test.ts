@@ -10,7 +10,8 @@ import {
   KeyCrawler,
   ValueLookupVertex,
   MapVertex,
-  DOMNodeVertex
+  DOMNodeVertex,
+  resolvePropertyLookup
 } from "../src/index"
 import { JSDOM } from 'jsdom'
 
@@ -391,5 +392,21 @@ describe("DOMNodeVertex", () => {
       key: 0,
       path: ['childNodes', 0]
     })
+  })
+})
+
+describe("resolvePropertyLookup", () => {
+  test("should be able to call a nested function and return the results", ()=>{
+    const results = resolvePropertyLookup(
+      { Math },
+      [
+        'Math',
+        {
+          name: 'min',
+          args: [1, 2]
+        }
+      ]
+    )
+    expect(results).toBe(1)
   })
 })

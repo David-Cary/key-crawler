@@ -26,7 +26,7 @@ export function executePropertyCall (
   if (request.name in context) {
     const value = (context as UntypedObject)[request.name]
     if (typeof value === 'function') {
-      return value(request.args)
+      return value.apply(null, request.args)
     }
   }
 }
