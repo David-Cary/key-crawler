@@ -83,6 +83,9 @@ In addition to basic traversals, key crawlers also support value searches throug
 
 The search function also accepts a `maxResults` value as it's third parameter, letting you do things like return after the first match.
 
+### Value Mapping
+As of 1.0.2, key crawlers have a `mapValue` function that helps you build a modified copy of a given object and it's traversed properties.  This takes 2 parameters, the object to be copied and the conversion function to be applied to each vertex visited.  Note that converstion function is given the traversal state as it's only parameter, giving you the ability to copy traversal information as part of this mapping.
+
 ### Extending Routes
 Key crawlers can also make it easy to visit the descendant of a given value, provided you have it's routes.  If you know the key path to the target value, simply call `extendRoute` for your crawler, with the target route and key list as parameters.  If you know the child's iteration order, you can pass that path into `extendRouteByIndices` instead.  For example, to get the first child of a route you'd use `crawler.extendRouteByIndices(route, [0])`.
 

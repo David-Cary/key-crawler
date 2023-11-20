@@ -12,6 +12,7 @@ export interface SearchResponse {
     state: TraversalState;
     results: TraversalRoute[];
 }
+export type SetChildCallback = (parent: AnyObject, key: ValidKey, child: any) => void;
 /**
  * Utility object for performing graph traversals with a particular set of settings, as well as transformations on the resulting routes.
  * @class
@@ -44,9 +45,26 @@ export declare class KeyCrawler {
      */
     search(root: AnyObject, callback: (state: TraversalState) => boolean, maxResults?: number): SearchResponse;
     /**
+     * Converts the provided value and it's children to the target format.
+     * @function
+     * @param {any} source - value to be converted
+     * @param {(state: TraversalState) => any} getValueFor - conversion to be applied for each value visited
+     * @param {addChild} SetChildCallback - callback for linking resulting child to it's parent
+     * @returns {any} converted value
+     */
+    mapValue(source: any, getValueFor: (state: TraversalState) => any, addChild?: SetChildCallback): any;
+    /**
+     * Provides default setter for javascipt objects and arrays.
+     * @function
+     * @param {AnyObject} target - object to be modified
+     * @param {ValidKey} key - property name/index to be used
+     * @param {any} value - value to be assigned
+     */
+    setChildValue(target: AnyObject, key: ValidKey, value: any): void;
+    /**
      * Populates a traversal route from a given point along a provided path.
      * @function
-     * @param {AnyObject>} root - object the traversal initially targets
+     * @param {AnyObject} root - object the traversal initially targets
      * @param {ValidKey[]} path - keys to use for each step of the traversal
      * @returns {TraversalRoute}
      */

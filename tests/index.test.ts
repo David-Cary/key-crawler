@@ -1,4 +1,5 @@
 import {
+  AnyObject,
   UntypedObject,
   ArrayVertex,
   ObjectVertex,
@@ -11,6 +12,8 @@ import {
   ValueLookupVertex,
   MapVertex,
   DOMNodeVertex,
+  TraversalState,
+  ValidKey,
   resolvePropertyLookup
 } from "../src/index"
 import { JSDOM } from 'jsdom'
@@ -254,6 +257,97 @@ describe("KeyCrawler", () => {
       expect(response.state.visited.length).toEqual(2)
     })
   })
+  describe("mapValue", () => {
+    test("should apply conversion function", () => {
+      const crawler = new KeyCrawler()
+      const result = crawler.mapValue(
+        [
+          { x: 0.1, y: 2.3 },
+          3.14
+        ],
+        (state: TraversalState) => {
+          const target = state.route.target
+          switch (typeof target) {
+            case 'object': {
+              if (target == null) return target
+              return Array.isArray(target) ? [] : {}
+            }
+            case 'number': {
+              return Math.floor(target)
+            }
+            default: {
+              return target
+            }
+          }
+        }
+      )
+      expect(result).toEqual([
+        { x: 0, y: 2 },
+        3
+      ])
+    })
+    test("should use the provided child setter", () => {
+      const crawler = new KeyCrawler(
+        undefined,
+        new ValueVertexFactory([
+          {
+            checkValue: (value: UntypedObject) => !Array.isArray(value),
+            createVertex: (value: UntypedObject) => new ValueLookupVertex(value, ['children', '$key'])
+          }
+        ])
+      )
+      const result = crawler.mapValue(
+        {
+          value: 'a',
+          children: [
+            { value: 'a1' },
+            { value: 'a2' }
+          ]
+        },
+        (state: TraversalState) => {
+          const target = state.route.target
+          if (typeof target === 'object' && target != null) {
+            return Array.isArray(target)
+              ? []
+              : {
+                value: (target as UntypedObject).value,
+                depth: state.route.path.length
+              }
+          }
+          return target
+        },
+        (
+          target: AnyObject,
+          key: ValidKey,
+          value: any
+        ) => {
+          const index = Number(key)
+          if (Array.isArray(target)) {
+            if (isNaN(index)) return
+            target[index] = value
+          } else {
+            const targetObject = target as UntypedObject
+            let children: any[]
+            if (Array.isArray(targetObject.children)) {
+              children = targetObject.children
+            } else {
+              children = []
+              targetObject.children = children
+            }
+            children[index] = value
+          }
+        }
+      )
+      expect(result).toEqual({
+        value: 'a',
+        depth: 0,
+        children: [
+          { value: 'a1', depth: 1 },
+          { value: 'a2', depth: 1}
+        ]
+      })
+    })
+  })
   describe("createRouteFrom", () => {
     test("should include target value", () => {
       const route = treeCrawler.createRouteFrom(
@@ -410,3 +504,4 @@ describe("resolvePropertyLookup", () => {
     expect(results).toBe(1)
   })
 })
+
