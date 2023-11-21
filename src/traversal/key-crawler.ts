@@ -215,6 +215,7 @@ export class KeyCrawler {
           const keyedVertex = vertex as KeyValueVertex
           const key = keyedVertex.getIndexedKey(index)
           if (key !== undefined) {
+            route.path.push(key)
             route.vertices.push(keyedVertex)
             route.target = keyedVertex.getKeyValue(key)
           } else break

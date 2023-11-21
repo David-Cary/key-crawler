@@ -12,6 +12,14 @@ export interface SearchResponse {
     state: TraversalState;
     results: TraversalRoute[];
 }
+/**
+ * Used for functions that assign object property values.
+ * @type
+ * @function
+ * @param {AnyObject} target - object to be modified
+ * @param {ValidKey} key - property name/index to be used
+ * @param {any} value - value to be assigned
+ */
 export type SetChildCallback = (parent: AnyObject, key: ValidKey, child: any) => void;
 /**
  * Utility object for performing graph traversals with a particular set of settings, as well as transformations on the resulting routes.
