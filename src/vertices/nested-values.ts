@@ -177,15 +177,13 @@ export class ValueLookupVertex<T = AnyObject, K extends ValidKey = ValidKey, V =
 
   getIndexedKey (index: number): ValidKey | undefined {
     const keys: ValidKey[] = []
-    if (index >= 0) {
-      let count = 0
-      for (const key of this.keyProvider) {
-        if (count === index) {
-          return key
-        }
-        count++
-        keys.push(key)
+    let count = 0
+    for (const key of this.keyProvider) {
+      if (count === index) {
+        return key
       }
+      count++
+      keys.push(key)
     }
     const wrappedIndex = getWrappedIndex(index, keys.length)
     return keys[wrappedIndex]
@@ -196,7 +194,7 @@ export class ValueLookupVertex<T = AnyObject, K extends ValidKey = ValidKey, V =
       const path = this.getValuePath(key)
       return resolvePropertyLookup(this.value as AnyObject, path) as (V | undefined)
     }
-  }
+  }aa
 
   getKeyIndex (key: ValidKey): number | undefined {
     let count = 0
