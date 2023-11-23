@@ -194,7 +194,7 @@ export class ValueLookupVertex<T = AnyObject, K extends ValidKey = ValidKey, V =
       const path = this.getValuePath(key)
       return resolvePropertyLookup(this.value as AnyObject, path) as (V | undefined)
     }
-  }aa
+  }
 
   getKeyIndex (key: ValidKey): number | undefined {
     let count = 0
