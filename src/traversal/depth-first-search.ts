@@ -41,6 +41,31 @@ export class DepthFirstSearch implements TraversalStrategy {
     callback?: (state: TraversalState) => void,
     converter: ValueVertexFactory = new ValueVertexFactory()
   ): void {
+    if (this.order === SearchOrder.PREORDER) {
+      this.extendPhasedTraversal(state, callback, undefined, converter)
+    } else {
+      this.extendPhasedTraversal(state, undefined, callback, converter)
+    }
+  }
+
+  startPhasedTraversal (
+    root: AnyObject,
+    preIterate?: (state: TraversalState) => void,
+    postIterate?: (state: TraversalState) => void,
+    converter?: ValueVertexFactory
+  ): TraversalState {
+    const state = createRootState(root)
+    this.extendPhasedTraversal(state, preIterate, postIterate, converter)
+    state.completed = true
+    return state
+  }
+
+  extendPhasedTraversal (
+    state: TraversalState,
+    preIterate?: (state: TraversalState) => void,
+    postIterate?: (state: TraversalState) => void,
+    converter: ValueVertexFactory = new ValueVertexFactory()
+  ): void {
     if (state.completed) {
       return
     }
@@ -51,8 +76,8 @@ export class DepthFirstSearch implements TraversalStrategy {
         return
       }
       state.visited.push(targetObject)
-      if (this.order === SearchOrder.PREORDER && callback != null) {
-        callback(state)
+      if (preIterate != null) {
+        preIterate(state)
         if (state.completed) {
           return
         }
@@ -67,7 +92,7 @@ export class DepthFirstSearch implements TraversalStrategy {
           for (const key of keyedVertex.keyProvider) {
             state.route.path.push(key)
             state.route.target = keyedVertex.getKeyValue(key)
-            this.extendTraversal(state, callback, converter)
+            this.extendPhasedTraversal(state, preIterate, postIterate, converter)
             if (state.completed) {
               return
             }
@@ -77,11 +102,19 @@ export class DepthFirstSearch implements TraversalStrategy {
           state.route.target = targetObject
         }
       }
-      if (this.order === SearchOrder.POSTORDER && callback != null) {
-        callback(state)
+      if (postIterate != null) {
+        postIterate(state)
       }
-    } else if (callback != null) {
-      callback(state)
+    } else {
+      if (preIterate != null) {
+        preIterate(state)
+        if (state.completed) {
+          return
+        }
+      }
+      if (postIterate != null) {
+        postIterate(state)
+      }
     }
   }
 }

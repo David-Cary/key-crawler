@@ -20,4 +20,6 @@ export declare class DepthFirstSearch implements TraversalStrategy {
     constructor(order?: SearchOrder);
     traverse(root: AnyObject, callback?: (state: TraversalState) => void, converter?: ValueVertexFactory): TraversalState;
     extendTraversal(state: TraversalState, callback?: (state: TraversalState) => void, converter?: ValueVertexFactory): void;
+    startPhasedTraversal(root: AnyObject, preIterate?: (state: TraversalState) => void, postIterate?: (state: TraversalState) => void, converter?: ValueVertexFactory): TraversalState;
+    extendPhasedTraversal(state: TraversalState, preIterate?: (state: TraversalState) => void, postIterate?: (state: TraversalState) => void, converter?: ValueVertexFactory): void;
 }

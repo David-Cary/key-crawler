@@ -114,3 +114,13 @@ You may also specify an iteration callback as the fourth parameter.  This callba
 In addition to standard vertex functionality, value lookup vertices have a `getValuePath` function that returns the full path to the target value for a given key.  This effectively converts a key to a property / accessor path.  The flipside of that is the `validateValuePath` function that will read such a path at a given point and try to extract both the matching subpath and what key it uses.
 
 You can pass these paths on to the library's `expandNestedValuePath` and `collapseNestedValuePath` functions.  `expandNestedValuePath` takes a vertex and key list and tries to build the full property path.  In contrast `collapseNestedValuePath` will take a vertex list and said full property path and try to extract the keys used to build that path.  These are useful if you want to navigate into a value without vertex information (full property path) or store a shortened version of a value's location (key path).
+
+## Phased Traversals
+As of version 1.1.0, depth first strategies support the performing traversals with separate preorder and postorder callbacks.  To do this simply call the strategy's startPhasedTraversal function like so:
+
+```
+const strategy = new DepthFirstSearch()
+strategy.startPhasedTraversal(root, preOrderCallback, postOrderCallback, valueVertexFactory)
+```
+
+This is useful in cased where you want to do set some value on the way down the tree but need to clean if up on your way back up before the the next sibling branch is visited.
