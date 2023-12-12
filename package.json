@@ -1,6 +1,6 @@
 {
   "name": "key-crawler",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "This library provides support for traversing objects and their values while providing information on the traversal state, pathing to target values, and the ability to manipulate said pathing to easily move to related values.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",

@@ -61,15 +61,24 @@ search.traverse(
     values.push(state.route.target)
   },
   new ValueVertexFactory([
-    {
-      checkValue: (value: UntypedObject) => 'children' in value,
-      createVertex: (value: UntypedObject) => new DefinedObjectVertex(value, ['children'])
+    (value: UntypedObject) => {
+      if ('children' in value) {
+        return new DefinedObjectVertex(value, ['children'])
+      }
     }
   ])
 )
 ```
 
-You'll not that factory accepts a list of creation rules as an optional parameter.  Those are executed in order until a match is found (`checkValue` returns true).  Once that happens it used `createVertex` to get a wrapper for the target object and skips all remaining rules.
+You'll note that factory accepts a list of creation rules as an optional parameter.  These are callbacks that return a vertex if the provided object meets their criteria.  The factory will use the first such rule to produce a vertex, defaulting to a generic `ObjectVertex` or `PrimitiveVertex` if none match.
+
+Prior to version 1.2.0, these rules were objects with separate `checkValue` and `createVertex` functions, so you'd use this instead:
+```
+{
+  checkValue: (value: UntypedObject) => 'children' in value,
+  createVertex: (value: UntypedObject) => new DefinedObjectVertex(value, ['children'])
+}
+```
 
 `UntypedObject` is a utility type for objects with no key or value type restrictions.
 
@@ -116,11 +125,11 @@ In addition to standard vertex functionality, value lookup vertices have a `getV
 You can pass these paths on to the library's `expandNestedValuePath` and `collapseNestedValuePath` functions.  `expandNestedValuePath` takes a vertex and key list and tries to build the full property path.  In contrast `collapseNestedValuePath` will take a vertex list and said full property path and try to extract the keys used to build that path.  These are useful if you want to navigate into a value without vertex information (full property path) or store a shortened version of a value's location (key path).
 
 ## Phased Traversals
-As of version 1.1.0, depth first strategies support the performing traversals with separate preorder and postorder callbacks.  To do this simply call the strategy's startPhasedTraversal function like so:
+As of version 1.1.0, depth first strategies support performing traversals with separate preorder and postorder callbacks.  To do this simply call the strategy's startPhasedTraversal function like so:
 
 ```
 const strategy = new DepthFirstSearch()
 strategy.startPhasedTraversal(root, preOrderCallback, postOrderCallback, valueVertexFactory)
 ```
 
-This is useful in cased where you want to do set some value on the way down the tree but need to clean if up on your way back up before the the next sibling branch is visited.
+This is useful in cased where you want to do set some value on the way down the tree but need to clean it up on your way back up before the the next sibling branch is visited.

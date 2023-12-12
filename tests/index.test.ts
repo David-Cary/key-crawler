@@ -64,9 +64,10 @@ describe("DefinedObjectVertex", () => {
 })
 
 const treeReader = new ValueVertexFactory([
-  {
-    checkValue: (value: UntypedObject) => 'children' in value,
-    createVertex: (value: UntypedObject) => new DefinedObjectVertex(value, ['children'])
+  (value: UntypedObject) => {
+    if ('children' in value) {
+      return new DefinedObjectVertex(value, ['children'])
+    }
   }
 ])
 
@@ -290,9 +291,10 @@ describe("KeyCrawler", () => {
       const crawler = new KeyCrawler(
         undefined,
         new ValueVertexFactory([
-          {
-            checkValue: (value: UntypedObject) => !Array.isArray(value),
-            createVertex: (value: UntypedObject) => new ValueLookupVertex(value, ['children', '$key'])
+          (value: UntypedObject) => {
+            if (!Array.isArray(value)) {
+              return new ValueLookupVertex(value, ['children', '$key'])
+            }
           }
         ])
       )
